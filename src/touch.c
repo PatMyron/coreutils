@@ -15,7 +15,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Rubin, Arnold Robbins, Jim Kingdon, David MacKenzie,
-   and Randy Smith. */
+   Pat Myron, and Randy Smith. */
 
 #include <config.h>
 #include <stdio.h>
@@ -43,6 +43,7 @@
   proper_name ("Arnold Robbins"), \
   proper_name ("Jim Kingdon"), \
   proper_name ("David MacKenzie"), \
+  proper_name ("Pat Myron"), \
   proper_name ("Randy Smith")
 
 /* Bitmasks for 'change_times'. */
@@ -86,8 +87,10 @@ static struct option const longopts[] =
   {"time", required_argument, NULL, TIME_OPTION},
   {"no-create", no_argument, NULL, 'c'},
   {"date", required_argument, NULL, 'd'},
-  {"reference", required_argument, NULL, 'r'},
   {"no-dereference", no_argument, NULL, 'h'},
+  {"parents", no_argument, NULL, 'p'},
+  {"reference", required_argument, NULL, 'r'},
+  {"verbose", no_argument, NULL, 'v'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -236,11 +239,13 @@ change the times of the file associated with standard output.\n\
   -m                     change only the modification time\n\
 "), stdout);
       fputs (_("\
+  -p, --parents          no error if existing, make parent directories as needed\n\
   -r, --reference=FILE   use this file's times instead of current time\n\
   -t STAMP               use [[CC]YY]MMDDhhmm[.ss] instead of current time\n\
       --time=WORD        change the specified time:\n\
                            WORD is access, atime, or use: equivalent to -a\n\
                            WORD is modify or mtime: equivalent to -m\n\
+  -v, --verbose          print a message for each created directory\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -304,6 +309,9 @@ main (int argc, char **argv)
           ref_file = optarg;
           break;
 
+        case 'p':
+            break;
+
         case 't':
           if (! posixtime (&newtime[0].tv_sec, optarg,
                            PDS_LEADING_YEAR | PDS_CENTURY | PDS_SECONDS))
@@ -322,6 +330,9 @@ main (int argc, char **argv)
         case_GETOPT_HELP_CHAR;
 
         case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
+
+        case 'v':
+            break;
 
         default:
           usage (EXIT_FAILURE);
